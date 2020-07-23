@@ -313,7 +313,9 @@
 #include <BaseTsd.h>
 typedef SSIZE_T ssize_t;
 
+#ifndef NOMINMAX
 #define NOMINMAX
+#endif
 #include <Windows.h>
 #include <winnt.h>
 
@@ -3326,10 +3328,10 @@ public:
     symOptions |= SYMOPT_LOAD_LINES | SYMOPT_UNDNAME;
     SymSetOptions(symOptions);
     EnumProcessModules(process, &module_handles[0],
-                       module_handles.size() * sizeof(HMODULE), &cbNeeded);
+                       static_cast<DWORD>(module_handles.size() * sizeof(HMODULE)), &cbNeeded);
     module_handles.resize(cbNeeded / sizeof(HMODULE));
     EnumProcessModules(process, &module_handles[0],
-                       module_handles.size() * sizeof(HMODULE), &cbNeeded);
+                       static_cast<DWORD>(module_handles.size() * sizeof(HMODULE)), &cbNeeded);
     std::transform(module_handles.begin(), module_handles.end(),
                    std::back_inserter(modules), get_mod_info(process));
     void *base = modules[0].base_address;
